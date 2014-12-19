@@ -1,0 +1,49 @@
+import QUnit from 'qunitjs';
+import Morph from 'morph-range';
+
+import { document, fragment, element, comment, domHelper } from 'support';
+
+QUnit.module('Morph tests');
+
+QUnit.test('can construct a Morph', function (assert) {
+  var m = new Morph(domHelper(), document.body);
+  assert.ok(m, "this test is fine" );
+});
+
+QUnit.test('can setContent of a morph', function (assert) {
+  var contextElement = document.body;
+  var morph = new Morph(domHelper(), contextElement);
+
+  var insertion = comment();
+
+  morph.setContent(insertion);
+
+  var frag = fragment(
+    element('p', 'before ', insertion, ' after')
+  );
+
+  morph.setContent('Hello World');
+
+  assert.equalHTML(frag, '<p>before Hello World after</p>', 'it updated');
+
+  morph.clear();
+
+  assert.equalHTML(frag, '<p>before <!----> after</p>', 'clear');
+
+  frag = fragment(frag);
+
+  morph.setContent('Another test...');
+
+  assert.equalHTML(frag, '<p>before Another test... after</p>', 'works after appending to a fragment');
+
+  var el = element('div', '\n', frag, '\n');
+
+  morph.setContent('Again');
+
+  assert.equalHTML(el, '<div>\n<p>before Again after</p>\n</div>', 'works after appending to an element');
+
+  morph.setContent('');
+
+  assert.equalHTML(el, '<div>\n<p>before  after</p>\n</div>', 'setting to empty');
+
+});
