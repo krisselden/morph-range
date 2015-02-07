@@ -47,3 +47,63 @@ QUnit.test('can setContent of a morph', function (assert) {
   assert.equalHTML(el, '<div>\n<p>before  after</p>\n</div>', 'setting to empty');
 
 });
+
+QUnit.test("When a single-element morph is replaced with a new node, the firstNode and lastNode of parents are updated recursively", function(assert) {
+  var dom = domHelper();
+
+  var parentMorph = new Morph(dom);
+  parentMorph.clear();
+
+  var childMorph = new Morph(dom);
+  childMorph.clear();
+
+  var grandchildMorph = new Morph(dom);
+  grandchildMorph.clear();
+
+  var morphFrag = document.createDocumentFragment();
+  morphFrag.appendChild(parentMorph.firstNode);
+
+  parentMorph.appendMorph(childMorph);
+  childMorph.appendMorph(grandchildMorph);
+
+  var frag = document.createDocumentFragment();
+  var text = document.createTextNode('hello');
+  frag.appendChild(text);
+  grandchildMorph.setNode(frag);
+
+  assert.strictEqual(parentMorph.firstNode, childMorph.firstNode, '1');
+  assert.strictEqual(parentMorph.lastNode, childMorph.lastNode, '2');
+  assert.strictEqual(childMorph.firstNode, grandchildMorph.firstNode, '3');
+  assert.strictEqual(childMorph.lastNode, grandchildMorph.lastNode, '4');
+
+  assert.strictEqual(parentMorph.firstNode, text, '5');
+  assert.strictEqual(parentMorph.lastNode, text, '6');
+  assert.strictEqual(childMorph.firstNode, text, '7');
+  assert.strictEqual(childMorph.firstNode, text, '8');
+  assert.strictEqual(grandchildMorph.lastNode, text, '9');
+  assert.strictEqual(grandchildMorph.lastNode, text, '10');
+});
+
+QUnit.test("when destroying a morph, set the parent's first and last nodes to null if needed", function(assert) {
+  var dom = domHelper();
+
+  var parentMorph = new Morph(dom);
+  parentMorph.clear();
+
+  var childMorph = new Morph(dom);
+  childMorph.clear();
+
+  var morphFrag = document.createDocumentFragment();
+  morphFrag.appendChild(parentMorph.firstNode);
+
+  parentMorph.appendMorph(childMorph);
+
+  var frag = document.createDocumentFragment();
+  frag.appendChild(document.createTextNode('hello'));
+  childMorph.setNode(frag);
+
+  childMorph.destroy();
+
+  assert.equal(parentMorph.firstNode, null);
+  assert.equal(parentMorph.lastNode, null);
+});
