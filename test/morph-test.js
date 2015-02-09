@@ -107,3 +107,23 @@ QUnit.test("when destroying a morph, set the parent's first and last nodes to nu
   assert.equal(parentMorph.firstNode, null);
   assert.equal(parentMorph.lastNode, null);
 });
+
+QUnit.test("When destroying a morph, do not explode if a parentMorph does not exist", function(assert) {
+  var dom = domHelper();
+  var morph = new Morph(dom);
+  morph.clear();
+
+  var morphFrag = document.createDocumentFragment();
+  morphFrag.appendChild(morph.firstNode);
+  assert.strictEqual(morphFrag.firstChild, morph.firstNode);
+  assert.strictEqual(morphFrag.lastChild, morph.lastNode);
+  morph.destroy();
+  assert.strictEqual(morphFrag.firstChild, null);
+});
+
+QUnit.test("When destroying a morph, do not explode if a parentNode does not exist", function(assert) {
+  var dom = domHelper();
+  var morph = new Morph(dom);
+  morph.destroy();
+  assert.ok(true, "The test did not crash");
+});
