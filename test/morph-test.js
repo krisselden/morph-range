@@ -10,6 +10,68 @@ QUnit.test('can construct a Morph', function (assert) {
   assert.ok(m, "this test is fine" );
 });
 
+QUnit.test('insertBeforeMorph adds a child morph and updates its parentMorph', function (assert) {
+  var parentMorph = new Morph(domHelper());
+
+  var insertion = comment();
+
+  var frag = fragment(insertion);
+
+  parentMorph.setContent(insertion);
+
+  assert.equalHTML(frag, '<!---->', 'initial');
+
+  var a = element('p', 'A');
+  var b = element('p', 'B');
+  var c = element('p', 'C');
+  var d = element('p', 'D');
+
+  var aMorph = new Morph(parentMorph.domHelper);
+  var bMorph = new Morph(parentMorph.domHelper);
+  var cMorph = new Morph(parentMorph.domHelper);
+  var dMorph = new Morph(parentMorph.domHelper);
+
+  aMorph.setContent(a);
+  bMorph.setContent(b);
+  cMorph.setContent(c);
+  dMorph.setContent(d);
+
+  // append when there is no list
+  parentMorph.insertBeforeMorph(bMorph, null);
+
+  assert.equalHTML(frag, '<p>B</p>', 'append B');
+  assert.strictEqual(parentMorph.firstNode, b);
+  assert.strictEqual(parentMorph.lastNode, b);
+  assert.strictEqual(parentMorph.firstChildMorph, bMorph, 'firstChildMorph to equal B morph');
+  assert.strictEqual(parentMorph.lastChildMorph, bMorph, 'lastChildMorph to equal B morph');
+
+  // append when there is one item
+  parentMorph.insertBeforeMorph(dMorph, null);
+
+  assert.equalHTML(frag, '<p>B</p><p>D</p>', 'append D');
+  assert.strictEqual(parentMorph.firstNode, b);
+  assert.strictEqual(parentMorph.lastNode, d);
+  assert.strictEqual(parentMorph.firstChildMorph, bMorph, 'firstChildMorph to be unchanged');
+  assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to change to D morph');
+
+  // insert before lastChildMorph
+  parentMorph.insertBeforeMorph(cMorph, dMorph);
+  assert.equalHTML(frag, '<p>B</p><p>C</p><p>D</p>', 'insert C before D');
+
+  assert.strictEqual(parentMorph.firstNode, b);
+  assert.strictEqual(parentMorph.lastNode, d);
+  assert.strictEqual(parentMorph.firstChildMorph, bMorph, 'firstChildMorph to be unchanged');
+  assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to be unchanged');
+
+  // insert before firstChildMorph
+  parentMorph.insertBeforeMorph(aMorph, bMorph);
+  assert.equalHTML(frag, '<p>A</p><p>B</p><p>C</p><p>D</p>', 'insert A before B');
+  assert.strictEqual(parentMorph.firstNode, a);
+  assert.strictEqual(parentMorph.lastNode, d);
+  assert.strictEqual(parentMorph.firstChildMorph, aMorph, 'firstChildMorph to change to A morph');
+  assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to be unchanged');
+});
+
 QUnit.test('can setContent of a morph', function (assert) {
   var morph = new Morph(domHelper());
 
