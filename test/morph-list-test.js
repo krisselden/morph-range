@@ -6,6 +6,12 @@ import Morph from 'morph-range';
 
 import { domHelper, document, fragment, element, text } from 'support';
 
+QUnit.config.autostart = false;
+
+setTimeout(function() {
+  QUnit.start();
+}, 500);
+
 QUnit.module('MorphList tests', {
   setup: commonSetup
 });
@@ -60,19 +66,9 @@ function morph(label) {
 }
 
 QUnit.test("can create a MorphList", function(assert) {
-  assert.strictEqual(list.parentMorphList, null);
+  assert.strictEqual(list.mountedMorph, null);
   assert.strictEqual(list.firstChildMorph, null);
   assert.strictEqual(list.lastChildMorph, null);
-});
-
-QUnit.test("can append a Morph into a MorphList", function(assert) {
-  var morph = new Morph(dom);
-
-  list.appendMorph(morph);
-
-  // TODO Deal with DOM
-
-  assertChildMorphs(assert, list, [ morph ]);
 });
 
 QUnit.test("can append a Morph into a MorphList using insertBefore", function(assert) {
@@ -207,14 +203,14 @@ QUnit.test("can remove three morphs in a MorphList", function(assert) {
   assertOrphanedMorphs(assert, [ morph1, morph2, morph3 ]);
 });
 
-QUnit.test("can append a MorphList into a MorphList", function(assert) {
-  var list2 = new MorphList(dom);
-  list2.label = "list2";
+//QUnit.test("can append a MorphList into a MorphList", function(assert) {
+  //var list2 = new MorphList(dom);
+  //list2.label = "list2";
 
-  list.appendMorph(list2);
+  //list.appendMorph(list2);
 
-  assertChildMorphs(assert, list, [ list2 ]);
-});
+  //assertChildMorphs(assert, list, [ list2 ]);
+//});
 
 var frag, root;
 
@@ -233,8 +229,8 @@ function domSetup() {
 }
 
 function assertInvariants(assert) {
-  assert.strictEqual(frag.firstChild, root.firstNode, "invariant: the fragment's first child is the list's first node");
-  assert.strictEqual(frag.lastChild, root.lastNode, "invariant: the fragment's last child is the list's last node");
+  assert.strictEqual(frag.firstChild, root.firstNode, "invariant: the fragment's first child is the root's first node");
+  assert.strictEqual(frag.lastChild, root.lastNode, "invariant: the fragment's last child is the root's last node");
 }
 
 QUnit.test("appending a morph updates the DOM representation", function(assert) {
@@ -283,6 +279,104 @@ QUnit.test("removing the last morph makes the mount point empty again", function
   list.removeChildMorph(morph1);
   assertInvariants(assert);
   assert.equalHTML(frag, "<!---->");
+});
+
+QUnit.test("multiple nestings is allowed", function(assert) {
+  var list2 = new MorphList(dom);
+  list2.label = "list2";
+
+  var middle = morph("middle");
+  middle.setMorphList(list2);
+
+  var content = morph("content");
+  content.setNode(text("hello world"));
+
+  list.appendMorph(middle);
+
+  list2.appendMorph(content);
+  assertInvariants(assert);
+
+  assert.equalHTML(frag, "hello world");
+
+  list2.removeChildMorph(content);
+  assertInvariants(assert);
+
+  assert.equalHTML(frag, "<!---->");
+
+  root.setNode(text("hello world"));
+  assertInvariants(assert);
+
+  assert.equalHTML(frag, "hello world");
+});
+
+var list2, c1, c2, c3;
+
+QUnit.module("Recursively updating firstNode and lastNode", {
+  setup: function() {
+    commonSetup();
+    domSetup();
+
+    list2 = new MorphList(dom);
+    list2.label = "list2";
+
+    var middle = morph("middle");
+    middle.setMorphList(list2);
+    list.appendMorph(middle);
+
+    c1 = morph("c1")
+    c1.setNode(text("c1"));
+
+    c2 = morph("c2")
+    c2.setNode(text("c2"));
+
+    c3 = morph("c3")
+    c3.setNode(text("c3"));
+
+    list2.appendMorph(c1);
+    list2.appendMorph(c2);
+    list2.appendMorph(c3);
+  }
+});
+
+QUnit.test("sanity checks", function(assert) {
+  assert.equalHTML(frag, "c1c2c3");
+  assertInvariants(assert);
+});
+
+QUnit.test("removing the first node updates firstNode", function(assert) {
+  list2.removeChildMorph(c1);
+  assertInvariants(assert);
+  assert.equalHTML(frag, "c2c3");
+});
+
+QUnit.test("removing the last node updates lastNode", function(assert) {
+  list2.removeChildMorph(c3);
+  assertInvariants(assert);
+  assert.equalHTML(frag, "c1c2");
+});
+
+QUnit.test("removing a middle node doesn't do anything", function(assert) {
+  list2.removeChildMorph(c2);
+  assertInvariants(assert);
+  assert.equalHTML(frag, "c1c3");
+});
+
+QUnit.test("prepending a node updates firstNode", function(assert) {
+  var c4 = morph("c4");
+  c4.setNode(text("c4"));
+
+  list2.insertBeforeMorph(c4, c1);
+  assertInvariants(assert);
+  assert.equalHTML(frag, "c4c1c2c3");
+});
+
+QUnit.test("appending a node updates lastNode", function(assert) {
+  var c4 = morph("c4");
+  c4.setNode(text("c4"));
+
+  list2.appendMorph(c4);
+  assertInvariants(assert);
+  assert.equalHTML(frag, "c1c2c3c4");
 });
 
 // V removeChildMorph
