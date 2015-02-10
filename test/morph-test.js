@@ -118,6 +118,59 @@ QUnit.test('insertContentBeforeMorph', function (assert) {
   assert.strictEqual(parentMorph.lastNode, d);
   assert.strictEqual(parentMorph.firstChildMorph, aMorph, 'firstChildMorph to change to A morph');
   assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to change to D morph');
+
+  cMorph.destroy();
+
+  assert.equalHTML(frag, '<p>A</p><p>B</p><p>D</p>', 'C was destroyed');
+  assert.strictEqual(parentMorph.firstChildMorph, aMorph, 'firstChildMorph unchanged');
+  assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph unchanged');
+  assert.strictEqual(dMorph.previousMorph, bMorph, 'D morph previousMorph is B');
+  assert.strictEqual(bMorph.nextMorph, dMorph, 'B morph nextMorph is D');
+
+  assert.strictEqual(cMorph.parentMorph, null);
+  assert.strictEqual(cMorph.firstNode, null);
+  assert.strictEqual(cMorph.lastNode, null);
+  assert.strictEqual(c.parentNode, null);
+
+  aMorph.destroy();
+
+  assert.equalHTML(frag, '<p>B</p><p>D</p>', 'A was destroyed');
+  assert.strictEqual(parentMorph.firstNode, b);
+  assert.strictEqual(parentMorph.firstChildMorph, bMorph, 'firstChildMorph is B');
+
+  assert.strictEqual(aMorph.parentMorph, null);
+  assert.strictEqual(aMorph.firstNode, null);
+  assert.strictEqual(aMorph.lastNode, null);
+  assert.strictEqual(a.parentNode, null);
+
+  dMorph.destroy();
+
+  assert.equalHTML(frag, '<p>B</p>', 'D was destroyed');
+  assert.strictEqual(parentMorph.lastNode, b);
+  assert.strictEqual(parentMorph.lastChildMorph, bMorph, 'firstChildMorph is B');
+
+  assert.strictEqual(dMorph.parentMorph, null);
+  assert.strictEqual(dMorph.firstNode, null);
+  assert.strictEqual(dMorph.lastNode, null);
+  assert.strictEqual(d.parentNode, null);
+
+  bMorph.destroy();
+
+  assert.strictEqual(bMorph.parentMorph, null);
+  assert.strictEqual(bMorph.firstNode, null);
+  assert.strictEqual(bMorph.lastNode, null);
+  assert.strictEqual(d.parentNode, null);
+
+  assert.strictEqual(parentMorph.firstChildMorph, null, 'firstChildMorph is null');
+  assert.strictEqual(parentMorph.lastChildMorph, null, 'lastChildMorph is null');
+
+  // insert the fragment
+  frag = fragment(frag);
+
+  // ensure list still works
+  parentMorph.insertContentBeforeMorph(a);
+
+  assert.equalHTML(frag, '<p>A</p>', 'detected insertion after clear');
 });
 
 QUnit.test('can setContent of a morph', function (assert) {
@@ -190,30 +243,6 @@ QUnit.test("When a single-element morph is replaced with a new node, the firstNo
   assert.strictEqual(childMorph.firstNode, text, '8');
   assert.strictEqual(grandchildMorph.lastNode, text, '9');
   assert.strictEqual(grandchildMorph.lastNode, text, '10');
-});
-
-QUnit.test("when destroying a morph, set the parent's first and last nodes to null if needed", function(assert) {
-  var dom = domHelper();
-
-  var parentMorph = new Morph(dom);
-  parentMorph.clear();
-
-  var childMorph = new Morph(dom);
-  childMorph.clear();
-
-  var morphFrag = document.createDocumentFragment();
-  morphFrag.appendChild(parentMorph.firstNode);
-
-  parentMorph.appendMorph(childMorph);
-
-  var frag = document.createDocumentFragment();
-  frag.appendChild(document.createTextNode('hello'));
-  childMorph.setNode(frag);
-
-  childMorph.destroy();
-
-  assert.equal(parentMorph.firstNode, null);
-  assert.equal(parentMorph.lastNode, null);
 });
 
 QUnit.test("When destroying a morph, do not explode if a parentMorph does not exist", function(assert) {
