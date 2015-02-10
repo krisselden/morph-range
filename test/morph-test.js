@@ -6,13 +6,12 @@ import { document, fragment, element, comment, domHelper } from 'support';
 QUnit.module('Morph tests');
 
 QUnit.test('can construct a Morph', function (assert) {
-  var m = new Morph(domHelper(), document.body);
+  var m = new Morph();
   assert.ok(m, "this test is fine" );
 });
 
 QUnit.test('can setContent of a morph', function (assert) {
-  var contextElement = document.body;
-  var morph = new Morph(domHelper(), contextElement);
+  var morph = new Morph(domHelper());
 
   var insertion = comment();
 
@@ -45,7 +44,6 @@ QUnit.test('can setContent of a morph', function (assert) {
   morph.setContent('');
 
   assert.equalHTML(el, '<div>\n<p>before  after</p>\n</div>', 'setting to empty');
-
 });
 
 QUnit.test("When a single-element morph is replaced with a new node, the firstNode and lastNode of parents are updated recursively", function(assert) {
