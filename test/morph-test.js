@@ -72,6 +72,54 @@ QUnit.test('insertBeforeMorph adds a child morph and updates its parentMorph', f
   assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to be unchanged');
 });
 
+QUnit.test('insertContentBeforeMorph', function (assert) {
+  var parentMorph = new Morph(domHelper());
+
+  var insertion = comment();
+
+  var frag = fragment(insertion);
+
+  parentMorph.setContent(insertion);
+
+  var bMorph = parentMorph.appendContent('B');
+  var dMorph = parentMorph.insertContentBeforeMorph('D', null);
+  var cMorph = parentMorph.insertContentBeforeMorph('C', dMorph);
+  var aMorph = parentMorph.insertContentBeforeMorph('A', bMorph);
+
+
+  assert.equalHTML(frag, 'ABCD', 'inserted content correctly');
+  assert.equal(parentMorph.firstNode.nodeValue, 'A');
+  assert.equal(parentMorph.lastNode.nodeValue, 'D');
+
+  var a = element('p', 'A');
+  var b = element('p', 'B');
+  var c = element('p', 'C');
+  var d = element('p', 'D');
+
+  aMorph.setContent(a);
+
+  assert.equalHTML(frag, '<p>A</p>BCD', 'changed list through returned A morph');
+  assert.strictEqual(parentMorph.firstNode, a);
+  assert.equal(parentMorph.lastNode.nodeValue, 'D');
+
+  bMorph.setContent(b);
+
+  assert.equalHTML(frag, '<p>A</p><p>B</p>CD', 'changed list through returned B morph');
+
+  cMorph.setContent(c);
+
+  assert.equalHTML(frag, '<p>A</p><p>B</p><p>C</p>D', 'changed list through returned C morph');
+
+  dMorph.setContent(d);
+
+  assert.equalHTML(frag, '<p>A</p><p>B</p><p>C</p><p>D</p>', 'changed list through returned D morph');
+
+  assert.strictEqual(parentMorph.firstNode, a);
+  assert.strictEqual(parentMorph.lastNode, d);
+  assert.strictEqual(parentMorph.firstChildMorph, aMorph, 'firstChildMorph to change to A morph');
+  assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to change to D morph');
+});
+
 QUnit.test('can setContent of a morph', function (assert) {
   var morph = new Morph(domHelper());
 
