@@ -72,6 +72,32 @@ QUnit.test('insertBeforeMorph adds a child morph and updates its parentMorph', f
   assert.strictEqual(parentMorph.lastChildMorph, dMorph, 'lastChildMorph to be unchanged');
 });
 
+QUnit.test('insertBeforeMorph inserts correctly when appending to the morph', function (assert) {
+  var parentMorph = new Morph(domHelper());
+
+  var insertion = comment();
+
+  var a = element('p', 'A');
+  var b = element('p', 'B');
+
+  var frag = fragment(a, insertion, b);
+
+  parentMorph.setContent(insertion);
+
+  var childMorph = parentMorph.insertContentBeforeMorph('Y', null);
+  assert.equalHTML(frag, '<p>A</p>Y<p>B</p>', 'appended content correctly');
+
+  parentMorph.insertContentBeforeMorph('W', childMorph);
+  assert.equalHTML(frag, '<p>A</p>WY<p>B</p>', 'prepended content correctly');
+
+  parentMorph.insertContentBeforeMorph('X', childMorph);
+  assert.equalHTML(frag, '<p>A</p>WXY<p>B</p>', 'inserted content correctly');
+
+  parentMorph.insertContentBeforeMorph('Z', null);
+  assert.equalHTML(frag, '<p>A</p>WXYZ<p>B</p>', 'inserted content correctly');
+});
+
+
 QUnit.test('insertContentBeforeMorph', function (assert) {
   var parentMorph = new Morph(domHelper());
 
