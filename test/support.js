@@ -1,6 +1,14 @@
 import SimpleDOM from 'simple-dom';
 import QUnit from 'qunitjs';
 
+/* global setTimeout */
+if (typeof setTimeout !== 'undefined') {
+  // give source maps a chance to load
+  setTimeout(function() {
+    QUnit.start();
+  }, 500);
+}
+
 export var isArray = (function () {
   if (Array.isArray) {
     return Array.isArray;
@@ -30,7 +38,7 @@ export function element(tagName, attrs) {
       el.setAttribute(key, attrs[key]);
     }
   }
-  
+
   for (; i<arguments.length; i++) {
     var node = arguments[i];
     if (typeof node === 'string') {

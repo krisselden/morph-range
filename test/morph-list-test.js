@@ -4,13 +4,9 @@ import Morph from 'morph-range';
 
 //import { document, fragment, element, comment, domHelper } from 'support';
 
-import { domHelper, document, fragment, element, text } from 'support';
+import { domHelper, document, text } from 'support';
 
 QUnit.config.autostart = false;
-
-setTimeout(function() {
-  QUnit.start();
-}, 500);
 
 QUnit.module('MorphList tests', {
   setup: commonSetup
@@ -60,7 +56,7 @@ function assertOrphanedMorphs(assert, expectedMorphs) {
 }
 
 function morph(label) {
-  var m = new Morph(dom);
+  var m = new Morph.empty(dom);
   m.label = label;
   return m;
 }
@@ -76,7 +72,6 @@ QUnit.test("can append a Morph into a MorphList using insertBefore", function(as
 
   list.insertBeforeMorph(morph1, null);
 
-  // TODO Deal with DOM
 
   assertChildMorphs(assert, list, [ morph1 ]);
 });
@@ -323,13 +318,13 @@ QUnit.module("Recursively updating firstNode and lastNode", {
     middle.setMorphList(list2);
     list.appendMorph(middle);
 
-    c1 = morph("c1")
+    c1 = morph("c1");
     c1.setNode(text("c1"));
 
-    c2 = morph("c2")
+    c2 = morph("c2");
     c2.setNode(text("c2"));
 
-    c3 = morph("c3")
+    c3 = morph("c3");
     c3.setNode(text("c3"));
 
     list2.appendMorph(c1);
