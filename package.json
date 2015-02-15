@@ -1,6 +1,6 @@
 {
   "name": "morph-range",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Tracks a DOM insertion point.",
   "main": "dist/morph-range.js",
   "scripts": {
