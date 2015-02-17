@@ -13,5 +13,6 @@
   "noarg": true,
   "undef": true,
   "unused": true,
-  "esnext": true
+  "esnext": true,
+  "boss": true
 }

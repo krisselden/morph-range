@@ -102,17 +102,17 @@ QUnit.test("can insert a Morph into the middle of a MorphList", function(assert)
   assertChildMorphs(assert, list, [ morph1, morph2, morph3 ]);
 });
 
-//QUnit.test("can move a morph from one list to another", function(assert) {
-  //var list2 = new MorphList(dom);
+QUnit.test("can move a morph from one list to another", function(assert) {
+  var list2 = new MorphList(dom);
 
-  //var morph1 = morph("morph1");
+  var morph1 = morph("morph1");
 
-  //list.appendMorph(morph1);
-  //list2.appendMorph(morph1);
+  list.appendMorph(morph1);
+  list2.appendMorph(morph1);
 
-  //assertChildMorphs(assert, list, [ ]);
-  //assertChildMorphs(assert, list2, [ morph1 ]);
-//});
+  assertChildMorphs(assert, list, [ ]);
+  assertChildMorphs(assert, list2, [ morph1 ]);
+});
 
 QUnit.test("can remove the only morph in a MorphList", function(assert) {
   var morph1 = morph("morph1");
@@ -374,9 +374,23 @@ QUnit.test("appending a node updates lastNode", function(assert) {
   assert.equalHTML(frag, "c1c2c3c4");
 });
 
-// V removeChildMorph
-// V clear
-// V sanity checks for inserting already-inserted nodes
-// * nested morphList
-// * appending morphList to morph
-// * changing a morphList in DOM updates its DOM
+QUnit.test("moving a morph from one list to another updates firstNode", function(assert) {
+  var list3 = new MorphList(dom);
+  var secondMiddle = morph("secondMiddle");
+  secondMiddle.setMorphList(list3);
+
+  list.appendMorph(secondMiddle);
+
+  var morph1 = morph("morph1");
+
+  list2.appendMorph(morph1);
+  assertInvariants(assert);
+
+  assertChildMorphs(assert, list2, [ c1, c2, c3, morph1 ]);
+
+  list3.appendMorph(morph1);
+  assertInvariants(assert);
+
+  assertChildMorphs(assert, list2, [ c1, c2, c3 ]);
+  assertChildMorphs(assert, list3, [ morph1 ]);
+});
