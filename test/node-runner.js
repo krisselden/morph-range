@@ -19,3 +19,5 @@ if (process.argv[2] === 'testem') {
 require('../dist/test');
 
 QUnit.load();
+
+QUnit.start();

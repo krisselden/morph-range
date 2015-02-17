@@ -10,6 +10,7 @@
   "author": "Kris Selden",
   "license": "MIT",
   "devDependencies": {
+    "blanket": "^1.1.6",
     "es6-module-transpiler": "^0.9.6",
     "qunit-extras": "^1.3.0",
     "qunitjs": "^1.16.0",
