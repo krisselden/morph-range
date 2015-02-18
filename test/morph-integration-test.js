@@ -1,5 +1,5 @@
 import QUnit from 'qunitjs';
-import MorphList from 'morph-list';
+import MorphList from 'morph-range/morph-list';
 import Morph from 'morph-range';
 
 import { fragment, element, comment, domHelper } from 'support';
