@@ -1,7 +1,7 @@
 import QUnit from 'qunitjs';
 import Morph from 'morph-range';
 
-import { document, fragment, element, comment, domHelper } from 'support';
+import { document, fragment, element, comment, text, domHelper } from 'support';
 
 QUnit.module('Morph tests');
 
@@ -64,4 +64,67 @@ QUnit.test("When destroying a morph, do not explode if a parentNode does not exi
   var morph = new Morph(dom);
   morph.destroy();
   assert.ok(true, "The test did not crash");
+});
+
+// Chrome bug https://code.google.com/p/chromium/issues/detail?id=475337
+QUnit.test('can setContent options on a morph with whitespace', function (assert) {
+  var morph = new Morph(domHelper());
+  var select = element('select');
+  var placeholder = comment();
+  select.appendChild(placeholder);
+  morph.setNode(placeholder);
+
+  var frag = fragment(
+    element('option'),
+    text(''),
+    element('option')
+  );
+
+  morph.setContent(frag);
+
+  assert.equal(select.selectedIndex, 0, 'selectedIndex is the first item inserted');
+});
+
+QUnit.test('can setContent selected option on a morph with whitespace', function (assert) {
+  var morph = new Morph(domHelper());
+  var select = element('select');
+  var placeholder = comment();
+  select.appendChild(placeholder);
+  morph.setNode(placeholder);
+
+  var selectedOption = element('option');
+  selectedOption.selected = true;
+
+  var frag = fragment(
+    selectedOption,
+    text(''),
+    element('option')
+  );
+
+  morph.setContent(frag);
+
+  assert.equal(select.selectedIndex, 0, 'selectedIndex is the first item');
+});
+
+QUnit.test('can setContent option with a selectedIndex already set', function (assert) {
+  var morph = new Morph(domHelper());
+  var select = element('select');
+  var placeholder = comment();
+  select.appendChild(placeholder);
+
+  var selectedOption = element('option');
+  selectedOption.selected = true;
+  select.appendChild(selectedOption);
+
+  morph.setNode(placeholder);
+
+  var frag = fragment(
+    element('option'),
+    text(''),
+    element('option')
+  );
+
+  morph.setContent(frag);
+
+  assert.equal(select.selectedIndex, 2, 'selectedIndex is the first item');
 });
