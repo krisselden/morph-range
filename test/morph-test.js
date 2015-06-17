@@ -65,3 +65,19 @@ QUnit.test("When destroying a morph, do not explode if a parentNode does not exi
   morph.destroy();
   assert.ok(true, "The test did not crash");
 });
+
+QUnit.test("When inserting a range into a morph, range is inserted in the correct order", function(assert) {
+  var dom = domHelper();
+  var morph = new Morph(dom);
+  var insertion = comment();
+  var el = element('div', insertion);
+  morph.setContent(insertion);
+  var frag = fragment(
+    element('p', 'a'),
+    element('p', 'b'),
+    element('p', 'c'),
+    element('p', 'd')
+  );
+  morph.setContent(frag);
+  assert.equalHTML(el, '<div><p>a</p><p>b</p><p>c</p><p>d</p></div>', 'updates range in correct order');
+});
