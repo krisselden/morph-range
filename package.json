@@ -16,5 +16,12 @@
     "qunitjs": "^1.16.0",
     "simple-dom": "^0.2.0",
     "testem": "^0.6.24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krisselden/morph-range.git"
+  },
+  "bugs": {
+    "url": "https://github.com/krisselden/morph-range/issues"
   }
 }
