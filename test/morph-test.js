@@ -10,6 +10,27 @@ QUnit.test('can construct a Morph', function (assert) {
   assert.ok(m, "this test is fine" );
 });
 
+QUnit.test('throws on invalid content', function (assert) {
+  var morph = new Morph(domHelper());
+
+
+  assert.throws(function() {
+    morph.setContent(function() { });
+  }, 'Unsupported Content: Cannot bind to function');
+
+  function foo() { }
+
+  if (foo.name === 'foo') {
+    assert.throws(function() {
+      morph.setContent(function functionName() { });
+    }, 'Unsupported Content: Cannot bind to function `functionName`');
+  } else {
+    assert.throws(function() {
+      morph.setContent(function functionName() { });
+    }, 'Unsupported Content: Cannot bind to function');
+  }
+});
+
 QUnit.test('can setContent of a morph', function (assert) {
   var morph = new Morph(domHelper());
 
