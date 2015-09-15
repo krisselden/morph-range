@@ -67,6 +67,23 @@ QUnit.test('can setContent of a morph', function (assert) {
   assert.equalHTML(el, '<div>\n<p>before  after</p>\n</div>', 'setting to empty');
 });
 
+QUnit.test('calling setContent with a SafeString uses domHelper for parsing', function(assert) {
+  var dom = domHelper();
+  var setMorphHTMLCalledWith = undefined;
+
+  dom.setMorphHTML = function(morph, html) {
+    setMorphHTMLCalledWith = html;
+  };
+
+  var morph = new Morph(dom);
+
+  // SafeString
+  var html = '<span>Hello</span>';
+  morph.setContent({ string: html });
+
+  assert.equal(setMorphHTMLCalledWith, html);
+});
+
 QUnit.test("When destroying a morph, do not explode if a parentMorph does not exist", function(assert) {
   var dom = domHelper();
   var morph = new Morph(dom);
