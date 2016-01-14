@@ -271,6 +271,48 @@ QUnit.test("When a single-element morph is replaced with a new node, the firstNo
   assert.strictEqual(grandchildMorph.lastNode, text, '10');
 });
 
+QUnit.test('uses toHTML for SafeString support', function (assert) {
+  var morph = new Morph(domHelper());
+
+  var insertion = comment();
+
+  morph.setContent(insertion);
+
+  var frag = fragment(
+    element('p', 'before ', insertion, ' after')
+  );
+
+  morph.setContent({
+    toHTML: function() {
+      return '<b>Hello World!</b>';
+    }
+  });
+
+  assert.equalHTML(frag, '<p>before <b>Hello World!</b> after</p>', 'it updated');
+});
+
+QUnit.test('an object with a .string property does not assume SafeString', function (assert) {
+  var morph = new Morph(domHelper());
+
+  var insertion = comment();
+
+  morph.setContent(insertion);
+
+  var frag = fragment(
+    element('p', 'before ', insertion, ' after')
+  );
+
+  morph.setContent({
+    string: '<b>Hellow World!</b>',
+
+    toString: function() {
+      return '<b>Hellow World!</b>';
+    }
+  });
+
+  assert.equalHTML(frag, '<p>before &lt;b&gt;Hellow World!&lt;/b&gt; after</p>', 'it updated');
+});
+
 QUnit.test("When destroying a morph, do not explode if a parentMorph does not exist", function(assert) {
   var dom = domHelper();
   var morph = new Morph(dom);

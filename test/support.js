@@ -1,4 +1,5 @@
 import SimpleDOM from 'simple-dom';
+import HTML5Tokenizer from 'simple-html-tokenizer';
 import QUnit from 'qunitjs';
 
 export var isArray = (function () {
@@ -17,7 +18,7 @@ export var document = (function (root){
   return new SimpleDOM.Document();
 }(this));
 
-export var parser = new SimpleDOM.HTMLParser(document, SimpleDOM.voidMap);
+export var parser = new SimpleDOM.HTMLParser(HTML5Tokenizer.tokenize, document, SimpleDOM.voidMap);
 
 export var serializer = new SimpleDOM.HTMLSerializer(SimpleDOM.voidMap);
 
@@ -96,6 +97,6 @@ DOMHelper.prototype = {
     return this.document.createTextNode(text);
   },
   parseHTML: function (text, context) {
-    return this.parser.parseHTML(text, context);
+    return this.parser.parse(text, context);
   }
 };
