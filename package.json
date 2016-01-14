@@ -15,6 +15,7 @@
     "qunit-extras": "^1.3.0",
     "qunitjs": "^1.16.0",
     "simple-dom": "^0.2.0",
+    "simple-html-tokenizer": "^0.2.1",
     "testem": "^0.6.24"
   }
 }
